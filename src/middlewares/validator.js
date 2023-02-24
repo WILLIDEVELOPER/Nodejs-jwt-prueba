@@ -32,10 +32,6 @@ export const checkEmailDomain = (req, res, next) => {
   const { email } = req.body;
   // Utilizar la función test() para comprobar si el correo electrónico es válido
   if (regex.test(email)) {
-    console.log("El correo electrónico es válido");
-    res.json({
-      message: `Email ${req.body.email} does valid`,
-    });
     next();
   } else {
     console.log("El correo electrónico no es válido");
