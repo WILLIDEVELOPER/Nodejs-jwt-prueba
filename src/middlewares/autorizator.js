@@ -46,14 +46,14 @@ export const isAdmin = async (req, res, next) => {
   return res.status(403).json({ message: "requiere admin role" });
 };
 
-export const modOrAdmin = async(req, res, next) =>{
-  if(isModerator){
-    next()
-    return;
-  }else if(isAdmin){
-    next()
-    return;
-  }
+// export const modOrAdmin = async(req, res, next) =>{
+//   if(isModerator){
+//     next()
+//     return;
+//   }else if(isAdmin){
+//     next()
+//     return;
+//   }
 
-  return res.status(403).json({ message: "requiere some role" });
-}
+//   return res.status(403).json({ message: "requiere some role" });
+// }
