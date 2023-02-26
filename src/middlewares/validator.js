@@ -27,14 +27,13 @@ export const checkRolesExisted = (req, res, next) => {
 };
 
 export const checkEmailDomain = (req, res, next) => {
-  const dominio = "udi.edu.co";
+  const dominio = "gmail.com";
   const regex = new RegExp(`^[a-zA-Z0-9._%+-]+@${dominio}$`);
   const { email } = req.body;
   // Utilizar la función test() para comprobar si el correo electrónico es válido
   if (regex.test(email)) {
     next();
   } else {
-    console.log("El correo electrónico no es válido");
     return res.status(400).json({
       message: `Email ${req.body.email} does not valid`,
     });
