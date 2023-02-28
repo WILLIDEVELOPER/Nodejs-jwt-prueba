@@ -6,8 +6,8 @@ const router = Router();
 
 router.get("/", productsCtrl.getProducts);
 router.get("/:productId", productsCtrl.getProductById);
-router.post("/", [auth.verifyToken, auth.isModerator], productsCtrl.createProduct);
-router.patch("/:productId", [auth.verifyToken, auth.isModerator], productsCtrl.updateProductById);
+router.post("/", [auth.verifyToken, auth.isAdminOrModerator], productsCtrl.createProduct);
+router.patch("/:productId", [auth.verifyToken, auth.isAdminOrModerator], productsCtrl.updateProductById);
 router.delete("/:productId", [auth.verifyToken, auth.isAdmin], productsCtrl.deleteProductById);
 
 
