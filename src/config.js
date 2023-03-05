@@ -6,5 +6,5 @@ export const MONGODB_URL = process.env.MONGODB_URL || "mongodb+srv://Mern:soto10
 export const PORT = process.env.PORT || 5000
 
 export default {
-    SECRET: "products-api"
+    SECRET: "Egresados-api"
 }

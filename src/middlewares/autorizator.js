@@ -3,63 +3,88 @@ import config from "../config";
 import User from "../models/User";
 import Role from "../models/Role";
 
+export const errorHandler = (err, req, res, next) => {
+  if (err.name === "UnauthorizedError") {
+    return res.status(401).json({ message: "Unauthorized" });
+  } else if (err.name === "ForbiddenError") {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+  return res.status(500).json({ message: err.message });
+};
+
 export const verifyToken = async (req, res, next) => {
   try {
     const token = req.headers["x-access-token"];
     console.log(token);
-    if (!token) return res.status(403).json({ message: "No token provider" });
+    if (!token) throw new jwt.UnauthorizedError("No token provider");
     const decoded = jwt.verify(token, config.SECRET);
     req.userId = decoded.id;
     const user = await User.findById(req.userId, { password: 0 });
-    if (!user) return res.status(404).json({ message: "no user found" });
+    if (!user) throw new jwt.UnauthorizedError("No user found");
     next();
   } catch (error) {
-    return res.status(401).json({ message: "Unatuthorized" });
+    next(error);
   }
 };
 
-export const isModerator = async (req, res, next) => {
-  const user = await User.findById(req.userId);
-  const roles = await Role.find({ _id: { $in: user.roles } });
-
-  for (let i = 0; i < roles.length; i++) {
-    if (roles[i].name === "moderator") {
+export const isUniLeader = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+    const roles = await Role.find({ _id: { $in: user.roles } });
+    let isLeader = false;
+    roles.forEach((role) => {
+      if (role.name === "lider universitario") {
+        isLeader = true;
+      }
+    });
+    if (isLeader) {
       next();
-      return;
+    } else {
+      throw new jwt.ForbiddenError("Requires lider universitario role");
     }
+  } catch (error) {
+    next(error);
   }
-
-  return res.status(403).json({ message: "requiere moderator role" });
 };
 
 export const isAdmin = async (req, res, next) => {
-  const user = await User.findById(req.userId);
-  const roles = await Role.find({ _id: { $in: user.roles } });
-
-  for (let i = 0; i < roles.length; i++) {
-    if (roles[i].name === "admin") {
+  try {
+    const user = await User.findById(req.userId);
+    const roles = await Role.find({ _id: { $in: user.roles } });
+    let isAdmin = false;
+    roles.forEach((role) => {
+      if (role.name === "admin") {
+        isAdmin = true;
+      }
+    });
+    if (isAdmin) {
       next();
-      return;
+    } else {
+      throw new jwt.ForbiddenError("Requires admin role");
     }
+  } catch (error) {
+    next(error);
   }
-
-  return res.status(403).json({ message: "requiere admin role" });
 };
 
-export const isAdminOrModerator = async (req, res, next) => {
-  const user = await User.findById(req.userId);
-  const roles = await Role.find({ _id: { $in: user.roles } });
-
-  for (let i = 0; i < roles.length; i++) {
-    if (roles[i].name === "admin") {
+export const isAdminOrUniLeader = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+    const roles = await Role.find({ _id: { $in: user.roles } });
+    let isAdminOrLeader = false;
+    roles.forEach((role) => {
+      if (role.name === "admin" || role.name === "lider universitario") {
+        isAdminOrLeader = true;
+      }
+    });
+    if (isAdminOrLeader) {
       next();
-      return;
+    } else {
+      throw new jwt.ForbiddenError("Requires admin or lider universitario role");
     }
-    if (roles[i].name === "moderator") {
-      next();
-      return;
-    }
+  } catch (error) {
+    next(error);
   }
-
-  return res.status(403).json({ message: "requiere admin o moderator role" });
 };
+
+

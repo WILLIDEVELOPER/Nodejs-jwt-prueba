@@ -8,10 +8,10 @@ export const createRoles = async () => {
 
     const values = await Promise.all([
       new Role({
-        name: "user",
+        name: "egresado",
       }).save(),
       new Role({
-        name: "moderator",
+        name: "lider universitario",
       }).save(),
       new Role({
         name: "admin",
