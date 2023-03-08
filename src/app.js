@@ -8,6 +8,7 @@ import cors from "cors";
 import fileUpload from "express-fileupload";
 import { errorHandler } from "./middlewares/autorizator";
 import fs from "fs-extra";
+import path from "path";
 
 const app = express();
 createRoles();
