@@ -16,15 +16,17 @@ createRoles();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
-const uploadDir = path.join(os.tmpdir(), 'upload');
+const uploadDir = path.join(os.tmpdir(), "upload");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-app.use(fileUpload({
-  useTempFiles: true,
-  tempFileDir: "./upload"
-}));
+app.use(
+  fileUpload({
+    useTempFiles: true,
+    tempFileDir: uploadDir, // cambiar "./upload" por la variable 'uploadDir'
+  })
+);
 
 app.use("/api/ads", adsRoutes);
 app.use("/api/auth", authRoutes);
