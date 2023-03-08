@@ -119,4 +119,4 @@ userSchema.statics.comparePassword = async (password, receivedPassword) => {
   return await bcrypt.compare(password, receivedPassword);
 };
 
-export default model("Egresados", userSchema);
+export default model("usuarios", userSchema);
