@@ -80,7 +80,7 @@ export const updateUserById = async (req, res) => {
     }
 
     if (updatedUser) {
-      res.status(200).json(updatedUser);
+      res.json(updatedUser);
     } else {
       res.status(404).json({ message: "User not found" });
     }
