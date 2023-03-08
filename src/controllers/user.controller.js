@@ -50,7 +50,7 @@ export const updateUserById = async (req, res) => {
       }, {});
 
       // Agregar la imagen al objeto de los campos a actualizar
-      fieldsToUpdate.profileImage = image;
+      fieldsToUpdate.profileImage = JSON.stringify(image);
 
       // Actualizar los campos del usuario
       updatedUser = await User.findByIdAndUpdate(

@@ -24,13 +24,13 @@ export const createAd = async (req, res, next) => {
       }, {});
 
       // Agregar la imagen al objeto de los campos a actualizar
-      fieldsToCreate.image = imagen;
+      fieldsToCreate.image = JSON.stringify(imagen);
 
       const ad = new Ad({
         fieldsToCreate
       });
-      await ad.save();
       await fs.remove(req.files.image.tempFilePath);
+      await ad.save();
       res.status(201).json(ad);
     } else {
       // Si no se cargó una imagen, actualizar solo los campos del modelo
@@ -102,7 +102,7 @@ export const updateAdById = async (req, res, next) => {
       }, {});
 
       // Agregar la imagen al objeto de los campos a actualizar
-      fieldsToUpdate.image = imagen;
+      fieldsToUpdate.image = JSON.stringify(imagen);
 
       // Actualizar los campos del usuario
       updatedAd = await Ad.findByIdAndUpdate(
