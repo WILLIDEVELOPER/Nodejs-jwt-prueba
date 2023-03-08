@@ -14,9 +14,11 @@ createRoles();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
-if (!fs.existsSync('upload')) {
-  fs.mkdirSync('upload');
+const uploadDir = path.join(os.tmpdir(), 'upload');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
 }
+
 app.use(fileUpload({
   useTempFiles: true,
   tempFileDir: "./upload"
