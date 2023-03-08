@@ -15,7 +15,7 @@ router.post(
 );
 router.patch(
   "/:adId",
-  [auth.verifyToken, auth.isAdminOrUniLeader],
+  [auth.verifyToken, auth.isAdminOrUniLeader, upload.single("image")],
   adCtrl.updateAdById
 );
 router.delete("/:adId", [auth.verifyToken, auth.isAdmin], adCtrl.deleteAdById);

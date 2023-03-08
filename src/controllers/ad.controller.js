@@ -45,18 +45,37 @@ export const getAdById = async (req, res, next) => {
 
 export const updateAdById = async (req, res, next) => {
   try {
-    const updatedAd = await Ad.findByIdAndUpdate(
-      req.params.adId,
-      req.body,
-      {
-        new: true,
-      }
-    );
+    const updatedAdFields = req.body;
+    const { adId } = req.params;
+
+    const ad = await Ad.findById(adId);
+    if (!ad) {
+      const error = new Error("Ad not found");
+      error.status = 404;
+      throw error;
+    }
+
+    // Actualiza solo las propiedades que se proporcionan en el cuerpo de la solicitud
+    Object.keys(updatedAdFields).forEach(key => {
+      ad[key] = updatedAdFields[key];
+    });
+
+    // Actualiza la imagen si se proporciona una nueva imagen
+    if (req.file) {
+      const uploadedResponse = await cloudinary.uploader.upload(req.file.path, {
+        upload_preset: "williamImages",
+      });
+      ad.image = uploadedResponse.secure_url;
+    }
+
+    const updatedAd = await ad.save();
+
     res.status(200).json(updatedAd);
   } catch (error) {
     next(error);
   }
 };
+
 
 
 export const deleteAdById = async (req, res, next) => {

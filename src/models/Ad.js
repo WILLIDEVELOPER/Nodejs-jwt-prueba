@@ -18,7 +18,6 @@ const adSchema = new Schema(
     },
     image: {
       type: String,
-      required: true,
     },
   },
   {
