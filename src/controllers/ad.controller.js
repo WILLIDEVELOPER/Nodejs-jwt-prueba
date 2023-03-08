@@ -1,20 +1,55 @@
 import Ad from "../models/Ad";
-import cloudinary from "../libs/configDinary";
+import { uploadImageAds } from "../libs/configDinary";
+import fs from "fs-extra";
 
 export const createAd = async (req, res, next) => {
   try {
-    const { titulo, descripcion, tipo } = req.body;
-    const uploadedResponse = await cloudinary.uploader.upload(req.file.path, {
-      upload_preset: "williamImages",
-    });
-    const ad = new Ad({
-      titulo,
-      descripcion,
-      tipo,
-      image: uploadedResponse.secure_url,
-    });
-    await ad.save();
-    res.status(201).json(ad);
+
+    if (req.files && req.files.image) {
+      // Subir la imagen a Cloudinary y obtener la URL segura y el public_id
+      const createdResponse = await uploadImageAds(req.files.image.tempFilePath)
+      const imagen = {
+        url: createdResponse.secure_url,
+        public_id: createdResponse.public_id,
+      };
+
+      // Extraer los campos del modelo que se enviarán en el cuerpo de la solicitud
+      const fieldsToCreate = Object.keys(Ad.schema.paths).reduce((acc, key) => {
+        if (key !== '__v' && key !== '_id') {
+          if (req.body[key] !== undefined) {
+            acc[key] = req.body[key];
+          }
+        }
+        return acc;
+      }, {});
+
+      // Agregar la imagen al objeto de los campos a actualizar
+      fieldsToCreate.image = imagen;
+
+      const ad = new Ad({
+        fieldsToCreate
+      });
+      await ad.save();
+      await fs.remove(req.files.image.tempFilePath);
+      res.status(201).json(ad);
+    } else {
+      // Si no se cargó una imagen, actualizar solo los campos del modelo
+      const fieldsToCreate = Object.keys(Ad.schema.paths).reduce((acc, key) => {
+        if (key !== '__v' && key !== '_id') {
+          if (req.body[key] !== undefined) {
+            acc[key] = req.body[key];
+          }
+        }
+        return acc;
+      }, {});
+
+      // crear los campos del usuario
+      const ad = new Ad({
+        fieldsToCreate
+      });
+      await ad.save();
+      res.status(201).json(ad);
+    }
   } catch (error) {
     next(error);
   }
@@ -45,34 +80,65 @@ export const getAdById = async (req, res, next) => {
 
 export const updateAdById = async (req, res, next) => {
   try {
-    const updatedAdFields = req.body;
-    const { adId } = req.params;
+    let updatedAd;
 
-    const ad = await Ad.findById(adId);
-    if (!ad) {
-      const error = new Error("Ad not found");
-      error.status = 404;
-      throw error;
+    // Verificar si se cargó una imagen en la solicitud
+    if (req.files && req.files.image) {
+      // Subir la imagen a Cloudinary y obtener la URL segura y el public_id
+      const uploadedResponse = await uploadImageAds(req.files.image.tempFilePath)
+      const imagen = {
+        url: uploadedResponse.secure_url,
+        public_id: uploadedResponse.public_id,
+      };
+
+      // Extraer los campos del modelo que se enviarán en el cuerpo de la solicitud
+      const fieldsToUpdate = Object.keys(Ad.schema.paths).reduce((acc, key) => {
+        if (key !== '__v' && key !== '_id') {
+          if (req.body[key] !== undefined) {
+            acc[key] = req.body[key];
+          }
+        }
+        return acc;
+      }, {});
+
+      // Agregar la imagen al objeto de los campos a actualizar
+      fieldsToUpdate.image = imagen;
+
+      // Actualizar los campos del usuario
+      updatedAd = await Ad.findByIdAndUpdate(
+        req.params.adId,
+        fieldsToUpdate,
+        { new: true }
+      );
+
+      await fs.remove(req.files.image.tempFilePath);
+    } else {
+      // Si no se cargó una imagen, actualizar solo los campos del modelo
+      const fieldsToUpdate = Object.keys(Ad.schema.paths).reduce((acc, key) => {
+        if (key !== '__v' && key !== '_id') {
+          if (req.body[key] !== undefined) {
+            acc[key] = req.body[key];
+          }
+        }
+        return acc;
+      }, {});
+
+      // Actualizar los campos del usuario
+      updatedAd = await Ad.findByIdAndUpdate(
+        req.params.adId,
+        fieldsToUpdate,
+        { new: true }
+      );
     }
 
-    // Actualiza solo las propiedades que se proporcionan en el cuerpo de la solicitud
-    Object.keys(updatedAdFields).forEach(key => {
-      ad[key] = updatedAdFields[key];
-    });
-
-    // Actualiza la imagen si se proporciona una nueva imagen
-    if (req.file) {
-      const uploadedResponse = await cloudinary.uploader.upload(req.file.path, {
-        upload_preset: "williamImages",
-      });
-      ad.image = uploadedResponse.secure_url;
+    if (updatedAd) {
+      res.status(200).json(updatedAd);
+    } else {
+      res.status(404).json({ message: "ad not found" });
     }
-
-    const updatedAd = await ad.save();
-
-    res.status(200).json(updatedAd);
   } catch (error) {
-    next(error);
+    console.error(error);
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 

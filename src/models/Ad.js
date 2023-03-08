@@ -1,5 +1,4 @@
 import { Schema, model } from "mongoose";
-import cloudinary from "../libs/configDinary"
 
 const adSchema = new Schema(
   {
@@ -26,20 +25,5 @@ const adSchema = new Schema(
   }
 );
 
-adSchema.pre("save", async function (next) {
-  if (this.isModified("image")) {
-    try {
-      const uploadedResponse = await cloudinary.uploader.upload(this.image, {
-        upload_preset: "williamImages",
-      });
-      this.image = uploadedResponse.secure_url;
-      next();
-    } catch (err) {
-      next(err);
-    }
-  } else {
-    next();
-  }
-});
 
 export default model("Anuncios", adSchema);

@@ -1,6 +1,5 @@
 import { Schema, model } from "mongoose";
 import bcrypt from "bcryptjs";
-import cloudinary from "../libs/configDinary";
 
 const userSchema = new Schema(
   {
@@ -110,22 +109,6 @@ const userSchema = new Schema(
     versionKey: false,
   }
 );
-
-userSchema.pre("save", async function (next) {
-  if (this.isModified("profileImage")) {
-    try {
-      const uploadedResponse = await cloudinary.uploader.upload(this.profileImage, {
-        upload_preset: "williamImages",
-      });
-      this.profileImage = uploadedResponse.secure_url;
-      next();
-    } catch (err) {
-      next(err);
-    }
-  } else {
-    next();
-  }
-});
 
 userSchema.statics.encryptPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);

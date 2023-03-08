@@ -1,5 +1,6 @@
 import User from "../models/User";
-import cloudinary from "../libs/configDinary";
+import { uploadImageUsers } from "../libs/configDinary";
+import fs from "fs-extra";
 
 export const getUsers = async (req, res) => {
   try {
@@ -29,22 +30,38 @@ export const updateUserById = async (req, res) => {
   try {
     let updatedUser;
 
-    // Verificar si se cargó un archivo en la solicitud
-    if (req.file) {
-      // Subir la imagen a Cloudinary y obtener la URL segura
-      const uploadedResponse = await cloudinary.uploader.upload(req.file.path, {
-        upload_preset: "williamImages",
-      });
-      const image = uploadedResponse.secure_url;
+    // Verificar si se cargó una imagen en la solicitud
+    if (req.files && req.files.profileImage) {
+      // Subir la imagen a Cloudinary y obtener la URL segura y el public_id
+      const uploadedResponse = await uploadImageUsers(req.files.profileImage.tempFilePath)
+      const image = {
+        url: uploadedResponse.secure_url,
+        public_id: uploadedResponse.public_id,
+      };
 
-      // Actualizar la propiedad de la imagen de perfil del usuario
+      // Extraer los campos del modelo que se enviarán en el cuerpo de la solicitud
+      const fieldsToUpdate = Object.keys(User.schema.paths).reduce((acc, key) => {
+        if (key !== '__v' && key !== '_id') {
+          if (req.body[key] !== undefined) {
+            acc[key] = req.body[key];
+          }
+        }
+        return acc;
+      }, {});
+
+      // Agregar la imagen al objeto de los campos a actualizar
+      fieldsToUpdate.profileImage = image;
+
+      // Actualizar los campos del usuario
       updatedUser = await User.findByIdAndUpdate(
         req.params.userId,
-        { profileImage: image },
+        fieldsToUpdate,
         { new: true }
       );
+
+      await fs.remove(req.files.profileImage.tempFilePath);
     } else {
-      // Extraer todos los campos del modelo y crear un objeto con los valores enviados en el cuerpo de la solicitud
+      // Si no se cargó una imagen, actualizar solo los campos del modelo
       const fieldsToUpdate = Object.keys(User.schema.paths).reduce((acc, key) => {
         if (key !== '__v' && key !== '_id') {
           if (req.body[key] !== undefined) {
@@ -69,9 +86,10 @@ export const updateUserById = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Something went wrong x" });
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 
 
 export const deleteUserById = async (req, res) => {
