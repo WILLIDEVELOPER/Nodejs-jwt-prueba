@@ -18,7 +18,7 @@ const adSchema = new Schema(
     image: {
       type: String,
     },
-    estado:{
+    estado: {
       type: String,
       required: true,
       enum: ["activo", "inactivo"],
