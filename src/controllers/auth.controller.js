@@ -30,6 +30,9 @@ export const signUp = async (req, res) => {
   }
 };
 export const signIn = async (req, res) => {
+  let token;
+  let isAdmin = false;
+
   const userFound = await User.findOne({ email: req.body.email }).populate(
     "roles"
   );
@@ -44,9 +47,23 @@ export const signIn = async (req, res) => {
   if (!matchPassword)
     return res.status(401).json({ token: null, message: "Invalid password" });
 
-  const token = jwt.sign({ id: userFound._id }, config.SECRET, {
-    expiresIn: 86400,
-  });
+  for (let i = 0; i < userFound.roles.length; i++) {
+    if (
+      userFound.roles[i] == "admin" ||
+      userFound.roles[i] == "lider universitario"
+    ) {
+      isAdmin = true;
+      break;
+    }
+  }
+
+  if (isAdmin) {
+    token = jwt.sign({ id: userFound._id }, config.SECRET);
+  } else {
+    token = jwt.sign({ id: userFound._id }, config.SECRET, {
+      expiresIn: 86400,
+    });
+  }
 
   res.json({ token });
 };
