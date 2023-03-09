@@ -20,6 +20,7 @@ const adSchema = new Schema(
     },
     set: {
       type: String,
+      required: true,
       enum: ["activo", "inactivo"],
     },
   },
