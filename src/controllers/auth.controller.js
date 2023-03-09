@@ -13,7 +13,7 @@ export const signUp = async (req, res) => {
       password: await User.encryptPassword(password),
     });
 
-    if (roles) {
+    if (roles && roles.length > 0) {
       const foundRoles = await Role.find({ name: { $in: roles } });
       newUser.roles = foundRoles.map((role) => role._id);
     } else {
@@ -29,6 +29,8 @@ export const signUp = async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
+
+
 export const signIn = async (req, res) => {
   let token;
   let isAdmin = false;
