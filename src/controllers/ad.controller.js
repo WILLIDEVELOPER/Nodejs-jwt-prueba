@@ -4,6 +4,8 @@ import fs from "fs-extra";
 
 export const createAd = async (req, res, next) => {
   try {
+    const {titulo, descripcion, tipo } = req.body
+    const fieldsToCreate = { titulo, descripcion, tipo };
 
     if (req.files && req.files.image) {
       // Subir la imagen a Cloudinary y obtener la URL segura y el public_id
@@ -13,47 +15,20 @@ export const createAd = async (req, res, next) => {
         public_id: createdResponse.public_id,
       };
 
-      // Extraer los campos del modelo que se enviarán en el cuerpo de la solicitud
-      const fieldsToCreate = Object.keys(Ad.schema.paths).reduce((acc, key) => {
-        if (key !== '__v' && key !== '_id') {
-          if (req.body[key] !== undefined) {
-            acc[key] = req.body[key];
-          }
-        }
-        return acc;
-      }, {});
+      // Agregar la imagen al objeto de los campos a crear
+      fieldsToCreate.imagen = imagen;
 
-      // Agregar la imagen al objeto de los campos a actualizar
-      fieldsToCreate.image = JSON.stringify(imagen);
-
-      const ad = new Ad({
-        fieldsToCreate
-      });
       await fs.remove(req.files.image.tempFilePath);
-      await ad.save();
-      res.status(201).json(ad);
-    } else {
-      // Si no se cargó una imagen, actualizar solo los campos del modelo
-      const fieldsToCreate = Object.keys(Ad.schema.paths).reduce((acc, key) => {
-        if (key !== '__v' && key !== '_id') {
-          if (req.body[key] !== undefined) {
-            acc[key] = req.body[key];
-          }
-        }
-        return acc;
-      }, {});
-
-      // crear los campos del usuario
-      const ad = new Ad({
-        fieldsToCreate
-      });
-      await ad.save();
-      res.status(201).json(ad);
     }
+
+    const ad = new Ad(fieldsToCreate);
+    await ad.save();
+    res.status(201).json(ad);
   } catch (error) {
     next(error);
   }
 };
+
 
 export const getAds = async (req, res, next) => {
   try {
