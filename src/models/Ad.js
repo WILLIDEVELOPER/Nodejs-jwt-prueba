@@ -18,6 +18,10 @@ const adSchema = new Schema(
     image: {
       type: String,
     },
+    estado:{
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
