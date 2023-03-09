@@ -21,6 +21,7 @@ const adSchema = new Schema(
     estado:{
       type: String,
       required: true,
+      enum: ["activo", "inactivo"],
     },
   },
   {
