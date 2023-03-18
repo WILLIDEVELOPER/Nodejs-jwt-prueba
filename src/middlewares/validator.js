@@ -4,7 +4,7 @@ import User from "../models/User";
 export const checkDuplicateUser = async (req, res, next) => {
   const user = await User.findOne({ username: req.body.username });
 
-  if (user) return res.status(400).json({ message: "Este nombre de usuaio ya existe" });
+  if (user) return res.status(400).json({ message: "Este nombre de usuario ya existe" });
 
   const email = await User.findOne({ email: req.body.email });
 
