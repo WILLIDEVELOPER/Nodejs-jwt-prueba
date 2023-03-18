@@ -4,11 +4,11 @@ import User from "../models/User";
 export const checkDuplicateUser = async (req, res, next) => {
   const user = await User.findOne({ username: req.body.username });
 
-  if (user) return res.status(400).json({ message: "Este usuario ya existe" });
+  if (user) return res.status(400).json({ message: "Este nombre de usuaio ya existe" });
 
   const email = await User.findOne({ email: req.body.email });
 
-  if (email) return res.status(400).json({ message: "Este email ya existe" });
+  if (email) return res.status(400).json({ message: "Este correo ya existe" });
 
   next();
 };
@@ -18,7 +18,7 @@ export const checkRolesExisted = (req, res, next) => {
     for (let i = 0; i < req.body.roles.length; i++) {
       if (!ROLES.includes(req.body.roles[i])) {
         return res.status(400).json({
-          message: `Este role no existe`,
+          message: `Este tipo de usuario no existe`,
         });
       }
     }
@@ -35,7 +35,7 @@ export const checkEmailDomain = (req, res, next) => {
     next();
   } else {
     return res.status(400).json({
-      message: `Email no valido`,
+      message: `Correo no valido`,
     });
   }
 };
