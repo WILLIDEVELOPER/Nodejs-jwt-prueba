@@ -39,7 +39,7 @@ export const signIn = async (req, res) => {
     "roles"
   );
 
-  if (!userFound) return res.status(400).json({ message: "User Not Found" });
+  if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
 
   const matchPassword = await User.comparePassword(
     req.body.password,
@@ -47,7 +47,7 @@ export const signIn = async (req, res) => {
   );
 
   if (!matchPassword)
-    return res.status(401).json({ token: null, message: "Invalid password" });
+    return res.status(401).json({ token: null, message: "Contraseña Incorrecta" });
 
   for (let i = 0; i < userFound.roles.length; i++) {
     if (
