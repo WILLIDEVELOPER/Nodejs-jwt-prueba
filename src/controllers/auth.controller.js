@@ -67,5 +67,5 @@ export const signIn = async (req, res) => {
     });
   }
 
-  res.json({ token });
+  res.json({ userFound, token });
 };
