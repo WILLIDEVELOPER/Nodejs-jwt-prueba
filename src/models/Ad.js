@@ -23,6 +23,10 @@ const adSchema = new Schema(
       required: true,
       enum: ["activo", "inactivo"],
     },
+    url:{
+      type: String,
+      required: true,
+    }
   },
   {
     timestamps: true,
