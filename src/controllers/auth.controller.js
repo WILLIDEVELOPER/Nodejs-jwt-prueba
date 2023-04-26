@@ -30,7 +30,6 @@ export const signUp = async (req, res) => {
   }
 };
 
-
 export const signIn = async (req, res) => {
   let token;
   let isAdmin = false;
@@ -39,7 +38,8 @@ export const signIn = async (req, res) => {
     "roles"
   );
 
-  if (!userFound) return res.status(400).json({ message: "Usuario no encontrado" });
+  if (!userFound)
+    return res.status(400).json({ message: "Usuario no encontrado" });
 
   const matchPassword = await User.comparePassword(
     req.body.password,
@@ -47,7 +47,9 @@ export const signIn = async (req, res) => {
   );
 
   if (!matchPassword)
-    return res.status(401).json({ token: null, message: "Contraseña Incorrecta" });
+    return res
+      .status(401)
+      .json({ token: null, message: "Contraseña Incorrecta" });
 
   for (let i = 0; i < userFound.roles.length; i++) {
     if (
