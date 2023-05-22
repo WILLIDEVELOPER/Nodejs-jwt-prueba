@@ -15,7 +15,11 @@ const app = express();
 createRoles();
 app.use(morgan("dev"));
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 const uploadDir = path.join(os.tmpdir(), "upload");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
