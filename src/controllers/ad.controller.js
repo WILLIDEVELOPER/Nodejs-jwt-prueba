@@ -18,7 +18,7 @@ export const createAd = async (req, res, next) => {
       };
 
       // Agregar la imagen al objeto de los campos a crear
-      fieldsToCreate.imagen = imagen;
+      fieldsToCreate.image = imagen;
 
       await fs.remove(req.files.image.tempFilePath);
     }
@@ -120,8 +120,8 @@ export const updateAdById = async (req, res, next) => {
 
 export const deleteAdById = async (req, res, next) => {
   try {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', '*');
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "*");
     const { adId } = req.params;
     await Ad.findByIdAndDelete(adId);
     res.status(200).json("Ad Deleted");
