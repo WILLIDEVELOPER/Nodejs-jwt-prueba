@@ -17,7 +17,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:3000",
   })
 );
 const uploadDir = path.join(os.tmpdir(), "upload");
