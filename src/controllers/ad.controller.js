@@ -18,7 +18,7 @@ export const createAd = async (req, res, next) => {
       };
 
       // Agregar la imagen al objeto de los campos a crear
-      fieldsToCreate.imagen = imagen;
+      fieldsToCreate.image = imagen;
 
       await fs.remove(req.files.image.tempFilePath);
     }
