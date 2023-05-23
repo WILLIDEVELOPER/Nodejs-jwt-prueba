@@ -4,8 +4,8 @@ import fs from "fs-extra";
 
 export const createAd = async (req, res, next) => {
   try {
-    const { titulo, descripcion, tipo, set } = req.body;
-    const fieldsToCreate = { titulo, descripcion, tipo, set };
+    const { titulo, descripcion, tipo, set, url } = req.body;
+    const fieldsToCreate = { titulo, descripcion, tipo, set, url };
 
     if (req.files && req.files.image) {
       // Subir la imagen a Cloudinary y obtener la URL segura y el public_id
